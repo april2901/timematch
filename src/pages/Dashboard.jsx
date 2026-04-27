@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LogOut, Plus, LogIn } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
@@ -18,6 +18,22 @@ export default function Dashboard({ session }) {
   const [joinPassword, setJoinPassword] = useState('');
   const [isJoining, setIsJoining] = useState(false);
   const [joinError, setJoinError] = useState('');
+
+  // My Rooms State
+  const [myRooms, setMyRooms] = useState([]);
+
+  useEffect(() => {
+    if (!session?.user?.id) return;
+    const fetchMyRooms = async () => {
+      const { data } = await supabase
+        .from('rooms')
+        .select('id, name, created_at')
+        .eq('creator_id', session.user.id)
+        .order('created_at', { ascending: false });
+      if (data) setMyRooms(data);
+    };
+    fetchMyRooms();
+  }, [session]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -155,6 +171,41 @@ export default function Dashboard({ session }) {
                {isJoining ? '입장 중...' : '입장하기'}
             </button>
           </form>
+        )}
+
+        {/* 내가 만든 방 목록 표출 영역 */}
+        {myRooms.length > 0 && (
+          <div className="glass-panel animate-fade-in" style={{ padding: '32px', marginTop: '8px' }}>
+            <h2 style={{ marginBottom: '16px', fontSize: '1.2rem' }}>내가 만든 일정 방</h2>
+            <ul style={{ listStyle: 'none', padding: 0 }}>
+              {myRooms.map(room => (
+                <li key={room.id} style={{ 
+                  padding: '16px 0', 
+                  borderBottom: '1px solid var(--grid-border)', 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'center',
+                  gap: '12px'
+                }}>
+                  <div style={{ flex: 1, overflow: 'hidden' }}>
+                    <div style={{ fontWeight: '500', marginBottom: '4px', textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }}>
+                      {room.name}
+                    </div>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                      {new Date(room.created_at).toLocaleDateString()} 생성됨
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => navigate(`/room/${room.id}`, { state: { verified: true } })}
+                    className="btn btn-secondary" 
+                    style={{ padding: '6px 12px', fontSize: '0.85rem', flexShrink: 0 }}
+                  >
+                    바로 입장
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
         )}
       </div>
     </div>
