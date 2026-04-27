@@ -15,16 +15,20 @@ A beautiful, real-time schedule alignment web application. `timeMatch` allows mu
    - **Direct Invite Links:** Invite others via a single click using copied shareable links. Guests accessing the link will be greeted by a lock screen to enter the room password.
 
 3. **Intuitive Drag & Drop Grid**
-   A highly responsive time grid lets users select their available hours by intuitively clicking and dragging across days and times.
+   A highly responsive time grid lets users select their available hours by intuitively clicking and dragging across days and times. Designed carefully to prevent any layout shifts for a buttery-smooth experience.
 
-4. **Blind Voting & Real-time Heatmap**
-   - **Anti-bias System:** You cannot see other people's schedule choices until you submit your own available time.
-   - **Real-time Heatmap:** Once submitted, overlapping availabilities are immediately visualized through a color-coded heatmap (the darker the color, the more people are available) synchronized in real-time via Supabase realtime channels.
+4. **Absolute Blind Voting & Real-time Heatmap**
+   - **Zero-Leak Anti-bias System:** You cannot see other people's schedule choices until you submit your own available time. The system actively protects data leaks against clicking empty slots, preventing users from receiving hints about others' selections before submitting.
+   - **Instant Real-time Heatmap:** Once submitted, overlapping availabilities are instantly visualized through a color-coded heatmap (the darker the color, the more people are available) synchronized in real-time via Supabase realtime channels without needing a page refresh.
 
-5. **Resource Auto-cleanup (2-Week Rule)**
+5. **Creator Dashboard & Room Management**
+   - Creators can easily keep track of 'Rooms I Created' within the dashboard for quick access.
+   - **Room Deletion:** Full control to delete custom rooms, completely wiping the room and seamlessly cascading deletion for all related participants' schedules to ensure data privacy.
+
+6. **Resource Auto-cleanup (2-Week Rule)**
    To optimize database resources, rooms with absolutely no activity or schedule updates for 14 straight days are automatically wiped from the database using PostgreSQL triggers and the `pg_cron` scheduler.
 
-6. **Modern Aesthetics**
+7. **Modern Aesthetics**
    Focus on extreme readability and beauty using a dynamic dark theme, glassmorphic panels, and smooth micro-animations.
 
 ---
