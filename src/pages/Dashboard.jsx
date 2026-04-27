@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Plus, LogIn } from 'lucide-react';
+import { LogOut, Plus, LogIn, Trash2 } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 
 export default function Dashboard({ session }) {
@@ -34,6 +34,26 @@ export default function Dashboard({ session }) {
     };
     fetchMyRooms();
   }, [session]);
+
+  const handleDeleteRoom = async (roomId) => {
+    if (!window.confirm('정말 이 방을 삭제하시겠습니까?\n관련된 모든 참가자의 일정도 영구적으로 삭제됩니다.')) {
+      return;
+    }
+    try {
+      const { error } = await supabase
+        .from('rooms')
+        .delete()
+        .eq('id', roomId);
+        
+      if (error) throw error;
+      
+      setMyRooms(prev => prev.filter(r => r.id !== roomId));
+      alert('방이 성공적으로 삭제되었습니다.');
+    } catch (error) {
+      alert('방 삭제에 실패했습니다: ' + error.message);
+      console.error(error);
+    }
+  };
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -195,13 +215,23 @@ export default function Dashboard({ session }) {
                       {new Date(room.created_at).toLocaleDateString()} 생성됨
                     </div>
                   </div>
-                  <button 
-                    onClick={() => navigate(`/room/${room.id}`, { state: { verified: true } })}
-                    className="btn btn-secondary" 
-                    style={{ padding: '6px 12px', fontSize: '0.85rem', flexShrink: 0 }}
-                  >
-                    바로 입장
-                  </button>
+                  <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
+                    <button 
+                      onClick={() => navigate(`/room/${room.id}`, { state: { verified: true } })}
+                      className="btn btn-secondary" 
+                      style={{ padding: '6px 12px', fontSize: '0.85rem' }}
+                    >
+                      바로 입장
+                    </button>
+                    <button 
+                      onClick={() => handleDeleteRoom(room.id)}
+                      className="btn btn-secondary" 
+                      style={{ padding: '6px', color: 'var(--danger)', borderColor: 'rgba(239, 68, 68, 0.2)' }}
+                      title="방 삭제"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
                 </li>
               ))}
             </ul>
