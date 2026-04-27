@@ -119,21 +119,18 @@ export default function TimeGrid({ roomId, session, allSchedules, hasSubmitted, 
 
   // 색상 농도 계산 (0 ~ 1)
   const getBackgroundColor = (slotId, isSelectedByMe) => {
-    const count = heatmapData[slotId] || 0;
-    
-    // 내가 현재 드래그 중인 로컬 상태의 선택은 별도로 시각화
-    // 히트맵 시각화 (남들이 선택한 정보)
-    // 🎲 내 스케줄을 안 냈으면 남의 정보도 안 보여주는 로직 적용!
-    if (!hasSubmitted && !isSelectedByMe) return 'var(--grid-bg-empty)';
+    // 🎲 내 스케줄을 낼 때까지는 철저히 블라인드 (남의 정보 count 접근 자체를 0으로 차단)
+    const count = hasSubmitted ? (heatmapData[slotId] || 0) : 0;
     
     if (count === 0 && !isSelectedByMe) return 'var(--grid-bg-empty)';
     
-    // 타인이 선택한 개수에 따라 투명도 조절
+    // 타인이 선택한 개원에 따라 투명도 증폭
     const intensity = Math.min(count / totalParticipants, 1);
     
     if (isSelectedByMe) {
-      // 내 선택은 항상 가장 또렷한 색이 베이스가 되도록
-      return `rgba(99, 102, 241, ${0.4 + (0.6 * intensity)})`;
+      // 내가 선택한 칸은 돋보이게 처리
+      // 단, 제출 전(블라인드 모드)일 때는 남의 선택 여부에 따른 투명도 변화(힌트)를 없애기 위해 고정 색상(0.85) 반환
+      return `rgba(99, 102, 241, ${hasSubmitted ? 0.4 + (0.6 * intensity) : 0.85})`;
     } else {
       // 타인만 선택했을 경우 에메랄드/민트 톤으로 표시
       return `rgba(6, 182, 212, ${0.1 + (0.9 * intensity)})`;
