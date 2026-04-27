@@ -190,7 +190,11 @@ export default function TimeGrid({ roomId, session, allSchedules, hasSubmitted, 
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center'
+                    justifyContent: 'center',
+                    boxSizing: 'border-box',
+                    minWidth: 0,
+                    minHeight: 0,
+                    overflow: 'hidden'
                   }}
                 >
                   {/* 여러 명이 선택한 시간엔 숫자로 표기하여 가시성 강화 (제출한 이후에만 제공) */}
