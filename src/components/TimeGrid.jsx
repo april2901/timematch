@@ -7,7 +7,7 @@ const START_HOUR = 8;
 const END_HOUR = 23;
 const displayHours = HOURS.filter(h => h >= START_HOUR && h <= END_HOUR);
 
-export default function TimeGrid({ roomId, session, allSchedules, hasSubmitted }) {
+export default function TimeGrid({ roomId, session, allSchedules, hasSubmitted, onSaveSuccess }) {
   const [selectedSlots, setSelectedSlots] = useState(new Set());
   const [isDragging, setIsDragging] = useState(false);
   const [dragMode, setDragMode] = useState(null);
@@ -108,6 +108,7 @@ export default function TimeGrid({ roomId, session, allSchedules, hasSubmitted }
       }
       
       alert('시간이 성공적으로 저장되었습니다!');
+      if (onSaveSuccess) onSaveSuccess();
     } catch (error) {
       console.error(error);
       alert('저장 중 오류가 발생했습니다.');

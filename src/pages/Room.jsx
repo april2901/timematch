@@ -21,6 +21,15 @@ export default function Room({ session }) {
 
   const hasSubmitted = schedules.some(s => s.user_id === session?.user?.id);
 
+  const fetchSchedules = async () => {
+    const { data: scheduleData } = await supabase
+      .from('schedules')
+      .select('*')
+      .eq('room_id', roomId);
+      
+    if (scheduleData) setSchedules(scheduleData);
+  };
+
   useEffect(() => {
     // 1. 방 정보 로드
     const fetchRoomData = async () => {
@@ -34,13 +43,8 @@ export default function Room({ session }) {
         if (roomError || !roomData) throw new Error('방을 찾을 수 없습니다.');
         setRoom(roomData);
         
-        // 2. 다른 사람들의 스케줄 로드
-        const { data: scheduleData } = await supabase
-          .from('schedules')
-          .select('*')
-          .eq('room_id', roomId);
-          
-        if (scheduleData) setSchedules(scheduleData);
+        // 2. 스케줄 로드
+        await fetchSchedules();
       } catch (err) {
         alert(err.message);
         navigate('/dashboard');
@@ -162,6 +166,7 @@ export default function Room({ session }) {
             session={session} 
             allSchedules={schedules}
             hasSubmitted={hasSubmitted}
+            onSaveSuccess={fetchSchedules}
           />
         </div>
 
